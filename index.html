@@ -18,14 +18,32 @@
         </header>
         <main class="main">
             <div class="canvas-wrapper">
-                <canvas class="canvas" width="300" height="600">YOUR BROWSER SUCKS GO GRAB SMTH NEWER</canvas>
-                <div class="preview preview_score"></div>
-                <div class="preview preview_figure"></div>
+                <canvas class="canvas-main" width="250" height="575">YOUR BROWSER SUCKS GO GRAB SMTH NEWER</canvas>
+                <ul class="panelbar">
+                    <li class="panelbar-item score">
+                    </li>
+                    <li class="panelbar-item">
+                        <canvas class="canvas-preview" width="60" height="60"></canvas>
+                    </li>
+                    <li class="panelbar-item">
+                        <button class="btn btn-start">START</button>
+                    </li>
+                </ul>
             </div>
         </main>
         <footer class="footer">
             <p class="copyright">Made by Stepanov, for Stepanov, with Stepanov</p>
         </footer>
+        <div class="gameover-screen">
+            <div class="gameover-container">
+                <p class="gameover-text">GAME OVER</p>
+                <p class="stats">
+                    Rows completed: <span class="stats-rows"></span><br>
+                    Points: <span class="stats-points"></span>
+                </p>
+            </div>
+            <div class="btn btn-close">ONE MORE TIME, BABY!</div>
+        </div>
         <div id="particles-js"></div>
     </div>
 </body>
