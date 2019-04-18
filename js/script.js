@@ -104,19 +104,34 @@ class basicFigure {
     rotateClockwise() {
         emptyField(fieldArray, this);
         for(let key in this) {
-            // console.log('do:', key+'')
-            // if(fieldArray[moveBlockClockwise(this[key]).yCoord][moveBlockClockwise(this[key]).xCoord] !== 0) {
-                // console.log('vse propalo');
-                // return
-            // } else {
-
-            moveBlockClockwise(this[key]);
-            // }
+            rotateBlock(this[key], true);
         }
+        for(let key in this) {
+            if(fieldArray[this[key].yCoord][this[key].xCoord] !== 0) {
+                for(let key in this) {
+                    rotateBlock(this[key], false);
+                }
+                return;
+            }
+        }        
         fillField(fieldArray, this, this.fieldValue);
         drawMain();
     }
     rotateAgainstClockwise() {
+        emptyField(fieldArray, this);
+        for(let key in this) {
+            rotateBlock(this[key], false);
+        }
+        for(let key in this) {
+            if(fieldArray[this[key].yCoord][this[key].xCoord] !== 0) {
+                for(let key in this) {
+                    rotateBlock(this[key], true);
+                }
+                return;
+            }
+        }      
+        fillField(fieldArray, this, this.fieldValue);
+        drawMain();
     }
 }
 
@@ -231,65 +246,86 @@ function basicMoves(fieldArray, figure, coord, operator) {
     drawMain();
 }
 
-function moveBlockClockwise(block) {
+function step(x, repeat, operator) {
+    let num = x;
+    for(let i = 0; i < repeat; i++) {
+        if(operator) {
+            num++;
+        } else {
+            num--;
+        }
+    }
+    return num;
+}
+
+function rotateBlock(block, operator) {
+    if(!operator) {
+        if(block.blockPosition === 1) {
+            block.blockPosition = 4;
+        } else {
+            block.blockPosition--;
+        }
+    }
     if(block.blockType === 'inner') { 
         switch(block.blockPosition) {
             case 1 :
-                block.yCoord++;
+                block.yCoord = step(block.yCoord, 1, operator);
                 break;
             case 2 :
-                block.xCoord--;
+                block.xCoord = step(block.xCoord, 1, !operator);
                 break;
             case 3 :
-                block.yCoord--;
+                block.yCoord = step(block.yCoord, 1, !operator);
                 break;
             case 4 :
-                block.xCoord++;
+                block.xCoord = step(block.xCoord, 1, operator);
                 break;
         }
     } else if (block.blockType === 'outerA') {
         switch(block.blockPosition) {
             case 1 :
-                block.xCoord -= 2;
-                block.yCoord++;
+                block.xCoord = step(block.xCoord, 2, !operator);
+                block.yCoord = step(block.yCoord, 1, operator);
                 break;
             case 2 :
-                block.xCoord--;
-                block.yCoord -= 2;
+                block.xCoord = step(block.xCoord, 1, !operator);
+                block.yCoord = step(block.yCoord, 2, !operator);
                 break;
             case 3 :
-                block.xCoord += 2;
-                block.yCoord--;
+                block.xCoord = step(block.xCoord, 2, operator);
+                block.yCoord = step(block.yCoord, 1, !operator);
                 break;
             case 4 :
-                block.xCoord++;
-                block.yCoord += 2;
+                block.xCoord = step(block.xCoord, 1, operator);
+                block.yCoord = step(block.yCoord, 2, operator);
                 break;
         }
     } else {
         switch(block.blockPosition) {
             case 1 :
-                block.xCoord++;
-                block.yCoord -= 2;
+                block.xCoord = step(block.xCoord, 1, operator);
+                block.yCoord = step(block.yCoord, 2, !operator);
                 break;
             case 2 :
-                block.xCoord += 2;
-                block.yCoord++;
+                block.xCoord = step(block.xCoord, 2, operator);
+                block.yCoord = step(block.yCoord, 1, operator);
                 break;
             case 3 :
-                block.xCoord--;
-                block.yCoord += 2;
+                block.xCoord = step(block.xCoord, 1, !operator);
+                block.yCoord = step(block.yCoord, 2, operator);
                 break;
             case 4 :
-                block.xCoord -= 2;
-                block.yCoord--;
+                block.xCoord = step(block.xCoord, 2, !operator);
+                block.yCoord = step(block.yCoord, 1, !operator);
                 break;
         }
     };  
-    if(block.blockPosition === 4) {
-        block.blockPosition = 1;
-    } else {
-        block.blockPosition++;
+    if(operator){
+        if(block.blockPosition === 4) {
+            block.blockPosition = 1;
+        } else {
+            block.blockPosition++;
+        }
     }
 };
 
@@ -432,21 +468,27 @@ function showGameover () {
 document.addEventListener('keydown', function(e) {
     if(e.keyCode === 90) {
         currentFigure.rotateClockwise();
+        return;
+    }
+    if(e.keyCode === 88) {
+        currentFigure.rotateAgainstClockwise();
+        return;
     }
     if(e.keyCode === 40) {
         currentFigure.moveDown();
+        return;
     }
     if(e.keyCode === 39) {
         currentFigure.moveRight();
+        return;
     }
     if(e.keyCode === 37) {
         currentFigure.moveLeft();
-    }
-    if(e.keyCode === 27) {
-        debugger;
+        return;
     }
     if(e.keyCode === 32) {
         currentFigure.drop();
+        return;
     }
 });
 
@@ -470,24 +512,27 @@ btnClose.addEventListener('click', function() {
 
 // BUG LIST
 
-// FIXME: when rotating near sides figures can stuck in walls
-// FIXME: rorating near other figures when error is thrown figure can overwrite alredy existing figure
-// FIXME: when rotating L on first step get a bug - it stuck in the top of playground.
+// DONE: when rotating L on first step get a bug - it stuck in the top of playground.
+// DONE: rorating near other figures when error is thrown figure can overwrite alredy existing figure
+// DONE: when rotating near sides figures can stuck in walls
 // DONE: disappearing row when colapsing two completed with incomplete between
 // DONE: points are not deleting on new game start
 // DONE: when pressing arrowdown when new figure appears, it sometimes instantly changes to another figure
 // DONE: figures of one type is transparent to each other DONE
-// DONE: two same figyre type in row
+// DONE: two same figure type in row
 // DONE: after row deleting the very left colunm is behaving strangly
 
-// TODO LIST
+// TODO LIST 
 
+// TODO:BIG: rewrite rotate functionality: concept - quandrants + figure searching 
+//       for posible space for rotation in that quandrant
 // TODO: adjust speed
-// TODO: wait a second between creating another figure
-// TODO: organize code
+// TODO:IMPORTANT: wait a second between creating another figure
+// TODO:IMPORTANT: organize code
 // TODO: points for speed
 // TODO: actually need to add visual flare - rows
 //       colapsing one by one, left rows filling their space not instantly but in observable way 
+// DONE: implemented rotation agains clockwise
 // DONE: drop button and func
 // DONE: close gameover screen
 // DONE: gather stats
